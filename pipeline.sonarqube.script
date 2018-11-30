@@ -1,0 +1,25 @@
+node {
+    //sonarqube docker container assigned private IP address
+    //found by running:
+    //docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' sonarqube
+    def SONAR_IP = "172.18.0.3"
+
+    def GRADLE_HOME = tool name: 'gradle-4.10.2', type: 'hudson.plugins.gradle.GradleInstallation'
+    sh "${GRADLE_HOME}/bin/gradle tasks"
+    
+    stage('prep') {
+        git url: 'https://github.com/jeremycook123/skynet.git'
+    }
+
+    stage('build') {
+        sh "cd webapp && ${GRADLE_HOME}/bin/gradle build"
+    }
+
+    stage('sonar-scanner') {
+      def sonarqubeScannerHome = tool name: 'sonar', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+      withCredentials([string(credentialsId: 'sonar', variable: 'sonarLogin')]) {
+        sh "${sonarqubeScannerHome}/bin/sonar-scanner -e -Dsonar.host.url=http://${SONAR_IP}:9000 -Dsonar.login=${sonarLogin} -Dsonar.projectName=webapp -Dsonar.projectVersion=${env.BUILD_NUMBER} -Dsonar.projectKey=GS -Dsonar.sources=webapp/src/main/ -Dsonar.tests=webapp/src/test/ -Dsonar.java.binaries=webapp/build/**/* -Dsonar.language=java"
+      }
+    }
+
+}
