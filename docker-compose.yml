@@ -2,8 +2,7 @@ version: "3.5"
 services:
   jenkins:
     container_name: jenkins
-    image: jenkins-ca:latest
-    #image: jenkins/jenkins:lts
+    image: jenkins/jenkins:lts
     networks:
       - cloudacademylabs
     ports:
