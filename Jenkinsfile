@@ -2,7 +2,7 @@
 node {
     def SONARQUBE_HOSTNAME = 'sonarqube'
 
-    def GRADLE_HOME = tool name: 'gradle-4.10.2', type: 'hudson.plugins.gradle.GradleInstallation'
+    def GRADLE_HOME = tool name: 'gradle-8.0-milestone-5', type: 'hudson.plugins.gradle.GradleInstallation'
     sh "${GRADLE_HOME}/bin/gradle tasks"
 
     stage('prep') {
